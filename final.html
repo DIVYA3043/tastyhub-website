@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TastyHub | Order Food Online</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(to bottom, #ff9900, #e65100);
+            --text-color: white;
+            --link-hover: #ffe300;
+            --card-bg: rgba(255, 255, 255, 0.15);
+            --card-text: #fff;
+            --highlight-color: #e65100;
+        }
+
+        body.light-mode {
+            --bg-gradient: linear-gradient(to bottom, #ffffff, #f8f8f8);
+            --text-color: #333;
+            --link-hover: #e65100;
+            --card-bg: rgba(0, 0, 0, 0.05);
+            --card-text: #333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-color);
+            padding: 2rem;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+            transition: background 0.5s ease, color 0.5s ease;
+        }
+
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, #ff9900, #e65100);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            flex-direction: column;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-bar {
+            width: 120px;
+            height: 16px;
+            background: linear-gradient(90deg, #ffffff33, #ffffff88, #ffffff33);
+            background-size: 200% 100%;
+            animation: slide 1.4s infinite ease-in-out;
+            margin-bottom: 1.5rem;
+            border-radius: 0;
+        }
+
+        @keyframes slide {
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        .progress-text {
+            position: absolute;
+            bottom: 30px;
+            left: 30px;
+            color: white;
+            font-size: 1.1rem;
+        }
+
+        body.loaded #loader {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .cursor-ripple {
+            position: fixed;
+            border-radius: 50%;
+            transform: scale(0);
+            animation: ripple-fade 0.6s ease-out forwards;
+            background-color: rgba(255, 255, 255, 0.2);
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        @keyframes ripple-fade {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        .bg-icon {
+            position: absolute;
+            z-index: 0;
+            animation: float 10s ease-in-out infinite;
+            pointer-events: none;
+            opacity: 0.1;
+        }
+
+        .bg-icon img {
+            width: 60px;
+            height: 60px;
+        }
+
+        .icon1 {
+            top: 10%;
+            left: 5%;
+        }
+
+        .icon2 {
+            top: 35%;
+            right: 10%;
+        }
+
+        .icon3 {
+            bottom: 15%;
+            left: 40%;
+        }
+
+        .icon4 {
+            top: 60%;
+            left: 15%;
+        }
+
+        .icon5 {
+            top: 20%;
+            right: 25%;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-15px);
+            }
+
+            100% {
+                transform: translateY(0);
+            }
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 0.8rem 2rem;
+            z-index: 999;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1100px;
+            margin: auto;
+        }
+
+        .logo {
+            font-weight: 700;
+            font-size: 1.3rem;
+            color: var(--text-color);
+        }
+
+        .nav-links a {
+            margin-left: 1.5rem;
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--link-hover);
+        }
+
+        .mode-toggle {
+            cursor: pointer;
+            margin-left: 1.5rem;
+            font-size: 0.9rem;
+            background: none;
+            border: 1px solid var(--text-color);
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            color: var(--text-color);
+        }
+
+        .hero {
+            margin-top: 6rem;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .rating-bar {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .headline {
+            font-size: 2.8rem;
+            font-weight: bold;
+            line-height: 1.4;
+            margin-bottom: 1rem;
+        }
+
+        .hover-word {
+            position: relative;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .hover-word:hover {
+            color: var(--link-hover);
+        }
+
+        .card-container {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-top: 1rem;
+            display: flex;
+            gap: 1rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            z-index: 10;
+        }
+
+        .hover-word:hover .card-container {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: var(--card-text);
+            padding: 1rem;
+            border-radius: 12px;
+            width: 220px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            animation: fadeInUp 0.4s ease forwards;
+            text-align: left;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+        }
+
+        .card img {
+            width: 100%;
+            border-radius: 8px;
+            margin-bottom: 0.6rem;
+        }
+
+        .card strong {
+            color: var(--highlight-color);
+            display: block;
+            margin-bottom: 0.3rem;
+            font-size: 1.1rem;
+        }
+
+        .card p {
+            font-size: 0.95rem;
+        }
+
+        .subtext {
+            margin-top: 0.8rem;
+            font-size: 1.1rem;
+        }
+
+        .cta-button {
+            margin-top: 1.5rem;
+            background: white;
+            color: #e65100;
+            font-weight: bold;
+            padding: 0.9rem 1.8rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .cta-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+        }
+
+        .see-link {
+            display: block;
+            margin-top: 1rem;
+            color: inherit;
+            text-decoration: underline;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .headline {
+                font-size: 2rem;
+            }
+
+            .card-container {
+                flex-direction: column;
+                left: 0;
+                transform: none;
+            }
+        }
+
+        #menu-section {
+            opacity: 0;
+            transition: opacity 0.6s ease;
+            display: none;
+        }
+
+        #menu-section.show {
+            opacity: 1;
+        }
+
+        /* Testimonials */
+        #testimonials {
+            color: var(--card-text);
+            text-align: center;
+        }
+
+        .testimonial-wrapper {
+            overflow: hidden;
+            max-width: 1100px;
+            margin: auto;
+        }
+
+        .testimonial-carousel {
+            display: flex;
+            gap: 2rem;
+            animation: scrollTestimonials 20s linear infinite;
+        }
+
+        .testimonial-card {
+            min-width: 300px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            flex-shrink: 0;
+            backdrop-filter: blur(10px);
+        }
+
+        .testimonial-card img {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-bottom: 1rem;
+        }
+
+        .testimonial-card p {
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+        }
+
+        .testimonial-card .stars {
+            color: gold;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .testimonial-card h4 {
+            margin: 0;
+            font-size: 1rem;
+            color: var(--highlight-color);
+        }
+
+        @keyframes scrollTestimonials {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-100%);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="loader">
+        <div class="loading-bar"></div>
+        <div class="progress-text" id="progress-text">0%</div>
+    </div>
+
+    <div class="bg-icon icon1"><img src="https://cdn-icons-png.flaticon.com/128/1404/1404945.png" alt="Pizza Icon">
+    </div>
+    <div class="bg-icon icon2"><img src="https://cdn-icons-png.flaticon.com/128/3075/3075929.png" alt="Burger Icon">
+    </div>
+    <div class="bg-icon icon3"><img src="https://cdn-icons-png.flaticon.com/128/1057/1057357.png" alt="Salad Icon">
+    </div>
+    <div class="bg-icon icon4"><img src="https://cdn-icons-png.flaticon.com/128/1046/1046784.png" alt="Fries Icon">
+    </div>
+    <div class="bg-icon icon5"><img src="https://cdn-icons-png.flaticon.com/128/135/135620.png" alt="Drink Icon"></div>
+
+    <header class="navbar">
+        <div class="nav-content">
+            <div class="logo">🍕TastyHub</div>
+            <nav class="nav-links">
+                <a href="#">Home</a>
+                <a href="#">Menu</a>
+                <a href="#">Offers</a>
+                <a href="#">Contact</a>
+                <button class="mode-toggle" onclick="toggleMode()">☀ / 🌙</button>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="rating-bar">
+            ⭐ 4.9 on Zomato &nbsp; | &nbsp; ⭐ 4.8 on Swiggy &nbsp; | &nbsp; ⭐ 1K+ Reviews on Google
+        </div>
+        <div class="headline">
+            Order
+            <span class="hover-word">pizzas
+                <div class="card-container">
+                    <div class="card"><img
+                            src="https://againstthegraingourmet.com/cdn/shop/products/Pepperoni_Pizza_Beauty_1200x1200.jpg"><strong>Pepperoni</strong>
+                        <p>Smoky, cheesy, fresh-baked.</p>
+                    </div>
+                    <div class="card"><img
+                            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRGsO8_BXeu1PTx2mLrb7OPazuxz4hJp273FQ&s"><strong>Veggie</strong>
+                        <p>Colorful veggies on thin crust.</p>
+                    </div>
+                    <div class="card"><img
+                            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRaTnD0_B1mZiOEc38C62n5oimw7Ii1nlsAaw&s"><strong>BBQ
+                            Chicken</strong>
+                        <p>Grilled chicken & smoky BBQ.</p>
+                    </div>
+                </div>
+            </span>,
+            <span class="hover-word">burgers
+                <div class="card-container">
+                    <div class="card"><img
+                            src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd"><strong>Cheesy
+                            Chicken</strong>
+                        <p>Crispy layers & melty cheese.</p>
+                    </div>
+                    <div class="card"><img
+                            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQqpCMCouPSDZqvpv2IMhuxCY8plDIEnexGtQ&s"><strong>Veg
+                            Classic</strong>
+                        <p>Veggies + cheese in a bun.</p>
+                    </div>
+                    <div class="card"><img
+                            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSva_F531akiT4l0amkyUaGx8fCT99iVmAUow&s"><strong>Paneer
+                            Tikka</strong>
+                        <p>Spicy paneer + creamy dressing.</p>
+                    </div>
+                </div>
+            </span> &
+            <span class="hover-word">salads
+                <div class="card-container">
+                    <div class="card"><img
+                            src="https://getinspiredeveryday.com/wp-content/uploads/2022/02/Easy-Green-Salad-Get-Inspired-Everyday-7.jpg"><strong>Green
+                            Bowl</strong>
+                        <p>Lettuce, veggies & house dressing.</p>
+                    </div>
+                    <div class="card"><img
+                            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDsa97h3F7GwiilRhV-zTxK-PnFNnzgv2xWw&s"><strong>Fruit
+                            Mix</strong>
+                        <p>Seasonal fruits with honey.</p>
+                    </div>
+                    <div class="card"><img
+                            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTI_8cgel8n22pVPxpkZsKNP9ikKAPxHEh3pg&s"><strong>Chicken
+                            Caesar</strong>
+                        <p>Chicken, croutons & parmesan.</p>
+                    </div>
+                </div>
+            </span>
+        </div>
+
+        <div class="subtext">✨ Powered by Smart Recommendations</div>
+        <button class="cta-button">Place Your First Order</button>
+        <a href="#" class="see-link">👁 Explore Menu</a>
+    </section>
+
+    <!-- FULL MENU SECTION -->
+    <section id="menu-section">
+        <h2 style="text-align: center; font-size: 2rem; margin-bottom: 2rem;">🍽 Our Menu</h2>
+        <div style="display: flex; flex-wrap: wrap; gap: 2rem; justify-content: center;">
+            <div class="card">
+                <img src="https://againstthegraingourmet.com/cdn/shop/products/Pepperoni_Pizza_Beauty_1200x1200.jpg"
+                    alt="Pepperoni Pizza">
+                <strong>Pepperoni Pizza</strong>
+                <p>Smoky, cheesy, fresh-baked.</p>
+                <p><b>₹249</b></p>
+            </div>
+            <div class="card">
+                <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd" alt="Cheesy Burger">
+                <strong>Cheesy Chicken Burger</strong>
+                <p>Layered with cheese and crispiness.</p>
+                <p><b>₹189</b></p>
+            </div>
+            <div class="card">
+                <img src="https://getinspiredeveryday.com/wp-content/uploads/2022/02/Easy-Green-Salad-Get-Inspired-Everyday-7.jpg"
+                    alt="Green Salad">
+                <strong>Fresh Green Salad</strong>
+                <p>Crisp veggies & house dressing.</p>
+                <p><b>₹129</b></p>
+            </div>
+            <div class="card">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDsa97h3F7GwiilRhV-zTxK-PnFNnzgv2xWw&s"
+                    alt="Fruit Salad">
+                <strong>Fruit Mix Salad</strong>
+                <p>Seasonal fruits with honey.</p>
+                <p><b>₹149</b></p>
+            </div>
+            <div class="card">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSva_F531akiT4l0amkyUaGx8fCT99iVmAUow&s"
+                    alt="Paneer Burger">
+                <strong>Paneer Tikka Burger</strong>
+                <p>Spicy paneer with creamy dressing.</p>
+                <p><b>₹199</b></p>
+            </div>
+        </div>
+    </section>
+    <!-- Testimonials Section -->
+    <section id="testimonials"
+        style="margin-top: 4rem; padding: 3rem 1rem; background: rgba(255,255,255,0.05); border-radius: 16px;">
+        <h2 style="text-align: center; font-size: 2rem; margin-bottom: 2rem;">💬 What Our Customers Say</h2>
+        <div class="testimonial-wrapper">
+            <div class="testimonial-carousel">
+
+                <!-- Testimonial 1 -->
+                <div class="testimonial-card">
+                    <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="User" />
+                    <p>"TastyHub has the most amazing pizzas! My kids love it. Delivery is super fast too!"</p>
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <h4>Priya Sharma</h4>
+                </div>
+
+                <!-- Testimonial 2 -->
+                <div class="testimonial-card">
+                    <img src="https://randomuser.me/api/portraits/men/42.jpg" alt="User" />
+                    <p>"The Paneer Tikka Burger is out of this world. Would 100% recommend to all foodies."</p>
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <h4>Rohit Mehta</h4>
+                </div>
+
+                <!-- Testimonial 3 -->
+                <div class="testimonial-card">
+                    <img src="https://randomuser.me/api/portraits/women/21.jpg" alt="User" />
+                    <p>"I tried the salad bowl and it was so fresh and filling! Healthy and tasty options available."
+                    </p>
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <h4>Ananya Desai</h4>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+
+    <!-- JavaScript -->
+    <script>
+        let progress = 0;
+        const progressText = document.getElementById("progress-text");
+        const interval = setInterval(() => {
+            progress += Math.floor(Math.random() * 10) + 5;
+            if (progress >= 100) {
+                progress = 100;
+                document.body.classList.add("loaded");
+                clearInterval(interval);
+            }
+            progressText.textContent = progress + "%";
+        }, 200);
+
+        function toggleMode() {
+            document.body.classList.toggle("light-mode");
+        }
+
+        document.addEventListener("mousemove", function (e) {
+            const ripple = document.createElement("div");
+            ripple.className = "cursor-ripple";
+            ripple.style.width = ripple.style.height = "40px";
+            ripple.style.left = `${e.clientX - 20}px`;
+            ripple.style.top = `${e.clientY - 20}px`;
+            document.body.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 600);
+        });
+
+        // Explore Menu behavior
+        document.querySelector('.see-link').addEventListener('click', function (e) {
+            e.preventDefault();
+            const menuSection = document.getElementById('menu-section');
+            if (!menuSection.classList.contains('show')) {
+                menuSection.style.display = 'block';
+                setTimeout(() => {
+                    menuSection.classList.add('show');
+                    menuSection.scrollIntoView({ behavior: 'smooth' });
+                }, 50);
+            }
+        });
+        // Pause testimonial animation on hover
+document.querySelector('.testimonial-carousel').addEventListener('mouseover', () => {
+  document.querySelector('.testimonial-carousel').style.animationPlayState = 'paused';
+});
+document.querySelector('.testimonial-carousel').addEventListener('mouseout', () => {
+  document.querySelector('.testimonial-carousel').style.animationPlayState = 'running';
+});
+
+    </script>
+</body>
+
+</html>
