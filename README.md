@@ -35,8 +35,8 @@ Clone this repo:
 bash
 Copy
 Edit
-git clone https://github.com/your-username/tastyhub.git
-Open index.html in any modern browser.
+git clone https://github.com/DIVYA3043/tastyhub-website/
+Open final.html in any modern browser.
 
 🎨 Customize It
 You can easily update:
